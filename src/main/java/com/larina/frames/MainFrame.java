@@ -2,14 +2,13 @@ package main.java.com.larina.frames;
 
 import main.java.com.larina.components.AutoEditTextScrollPane;
 import main.java.com.larina.components.EditTextButton;
-import main.java.com.larina.components.TextLabel;
 import main.java.com.larina.model.TextContainer;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-
+    private static final int FONTSIZE = 14;
     private static final int WIDTH_DEVIDER = 4;
     private static final double WIDTH_TO_HEIGHT_RATIO = 0.75;
     private static final String INIT_TEXT = "";
@@ -36,16 +35,34 @@ public class MainFrame extends JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
         int width = screenSize.width / (WIDTH_DEVIDER + 1);
+        JTextArea mainTextArea = addTextPanel(mainPanel, textContainer);
         addEditTextButton(mainPanel, width, textContainer);
         addIndent(mainPanel);
-        addCheckBox("Bold", 2, mainPanel);
-        addCheckBox("Italic", 3, mainPanel);
-        addCheckBox("Centered", 4, mainPanel);
-        addTextPanel(mainPanel, textContainer);
+        JCheckBox boldCheckBox = addCheckBox("Bold", 2, mainPanel);
+        JCheckBox italicCheckBox = addCheckBox("Italic", 3, mainPanel);
+
+        boldCheckBox.addActionListener(e -> {
+            int mode = boldCheckBox.isSelected() ? Font.BOLD : 0;
+            if(italicCheckBox.isSelected()){
+                mode += Font.ITALIC;
+            }
+
+            mainTextArea.setFont(new Font("Sefif", mode, FONTSIZE));
+        });
+
+        italicCheckBox.addActionListener(e -> {
+            int mode = italicCheckBox.isSelected() ? Font.ITALIC : 0;
+            if(boldCheckBox.isSelected()){
+                mode += Font.BOLD;
+            }
+            mainTextArea.setFont(new Font("Sefif", mode, FONTSIZE));
+        });
+//        addCheckBox("Centered", 4, mainPanel);
+
     }
 
-    private static void addTextPanel(JPanel mainPanel, TextContainer textContainer) {
-        JScrollPane scrollPane = new AutoEditTextScrollPane(textContainer);
+    private static JTextArea addTextPanel(JPanel mainPanel, TextContainer textContainer) {
+        AutoEditTextScrollPane scrollPane = new AutoEditTextScrollPane(textContainer);
         GridBagConstraints gbcText = new GridBagConstraints();
         gbcText.insets = new Insets(10, 10, 10, 10);
         gbcText.gridx = 0;
@@ -56,11 +73,12 @@ public class MainFrame extends JFrame {
         gbcText.weighty = 1.0;
         gbcText.anchor = GridBagConstraints.CENTER;
         mainPanel.add(scrollPane, gbcText);
+        return scrollPane.getTextArea();
     }
 
-    private static void addCheckBox(String Italic, int gridx, JPanel mainPanel) {
-        JCheckBox italicCheckBox = new JCheckBox();
-        italicCheckBox.setText(Italic);
+    private static JCheckBox addCheckBox(String Italic, int gridx, JPanel mainPanel) {
+        JCheckBox checkBox = new JCheckBox();
+        checkBox.setText(Italic);
         GridBagConstraints gbcItalicCheck = new GridBagConstraints();
         gbcItalicCheck.insets = new Insets(10, 10, 10, 10);
         gbcItalicCheck.gridx = gridx;
@@ -68,7 +86,8 @@ public class MainFrame extends JFrame {
         gbcItalicCheck.fill = GridBagConstraints.NONE;
         gbcItalicCheck.weightx = 0;
         gbcItalicCheck.anchor = GridBagConstraints.EAST;
-        mainPanel.add(italicCheckBox, gbcItalicCheck);
+        mainPanel.add(checkBox, gbcItalicCheck);
+        return checkBox;
     }
 
     private static void addIndent(JPanel mainPanel) {
